@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Виктор Каргалов](https://up.htmlacademy.ru/ecmascript/11/user/566813).
-* Наставник: `Неизвестно`.
+* Наставник: [Жора Милевский](https://htmlacademy.ru/profile/id366911).
 
 ---
 
