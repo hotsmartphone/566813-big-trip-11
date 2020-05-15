@@ -1,13 +1,9 @@
 import {EVENT_TYPES} from "../const.js";
-
 const MIN_OFFER_COST = 1;
 const MAX_OFFER_COST = 300;
-
 const MAX_COUNT_OFFERS_FOR_TYPE = 5;
-
 const MIN_POINT_COST = 1;
 const MAX_POINT_COST = 1000;
-
 const MAX_TRIP_DAYS_FROM = 10; // для генерации в моках случайной начальной даты
 const MAX_EVENT_DAYS = 2; // максимальное количество дней одного события, для моков
 const ONE_DAY_TIME = 86400000; // время одного дня в мс, для моков
