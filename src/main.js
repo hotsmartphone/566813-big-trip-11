@@ -19,22 +19,6 @@ const render = (container, template, place = `beforeend`) => {
 };
 
 const events = generateEvents(POINT_TRIP_COUNT);
-console.log(events);
-
-render(tripMain, createTripInfoTemplate(), `afterbegin`);
-
-const tripInfo = tripMain.querySelector(`.trip-info`);
-
-render(tripInfo, createTripCostTemplate());
-render(menuControls, createViewMenuTemplate(), `afterend`);
-render(tripControls, createTripFiltersTemplate());
-render(tripEvents, createTripSortTemplate());
-render(tripEvents, createNewEventTemplate(events[0]));
-
-// const eventsList = tripEvents.querySelector(`.trip-events__list`);
-//
-// events.slice(1, events.length - 1)
-// .forEach((event) => render(eventsList, createEventItemTemplate(event), `afterbegin`));
 
 const groupEvents = (event, container) => { // функция добавляет карточку в определенную группу - день
   const eventDate = new Date(event.dateFrom.getFullYear(), event.dateFrom.getMonth(), event.dateFrom.getDate());
@@ -59,7 +43,6 @@ const groupEvents = (event, container) => { // функция добавляет
   }
 };
 
-
 const groupAndSortEventsByDays = (eventsArr) => { // функция  принимает мааасив событий, сортирует и группирует по датам
   const groupedEvents = [];
 
@@ -75,10 +58,22 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
     });
   });
 
-  return groupedEvents;
+  return groupedEvents; // на выходе получаем массив объектов с ключами "День" и "События" (этого дня), сортированные по дате
 };
 
 const groupedEvents = groupAndSortEventsByDays(events);
+
+console.log(events);
+
+render(menuControls, createViewMenuTemplate(), `afterend`);
+render(tripControls, createTripFiltersTemplate());
+render(tripEvents, createTripSortTemplate());
+render(tripEvents, createNewEventTemplate(events[0]));
+render(tripMain, createTripInfoTemplate(events, groupedEvents), `afterbegin`);
+
+const tripInfo = tripMain.querySelector(`.trip-info`);
+
+render(tripInfo, createTripCostTemplate(events));
 
 console.log(`Сгруппированный и отсортированный массив]`);
 console.log(groupedEvents);

@@ -1,7 +1,8 @@
+import {EVENT_TYPES} from "../const.js";
+
 const MIN_OFFER_COST = 1;
 const MAX_OFFER_COST = 300;
 
-const MIN_COUNT_OFFERS_FOR_TYPE = 1;
 const MAX_COUNT_OFFERS_FOR_TYPE = 5;
 
 const MIN_POINT_COST = 1;
@@ -9,16 +10,14 @@ const MAX_POINT_COST = 1000;
 
 const MAX_TRIP_DAYS_FROM = 10; // для генерации в моках случайной начальной даты
 const MAX_EVENT_DAYS = 2; // максимальное количество дней одного события, для моков
-const ONE_DAY_TIME = 86400000; // время в мс, для моков
+const ONE_DAY_TIME = 86400000; // время одного дня в мс, для моков
 
 
-const eventTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 const cities = [`Amsterdam`, `Geneva`, `Chamonix`, `Prague`, `Saint Petersburg`];
 
-// Моки
 const offerTitles = [`Upgrade to a business class`, `Choose the radio station`, `Add luggage`, `Switch to comfort`, `Book tickets`, `Lunch in city`, `Rent a car`, `Order Uber`, `Add breakfast`];
 
-const descrtiption = [
+const descrtiptions = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   `Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra.`,
   `Aliquam id orci ut lectus varius viverra.`,
@@ -32,7 +31,7 @@ const descrtiption = [
 ];
 
 const getRandomArrayItem = (array) => {
-  const randomIndex = getRandomIntegerNumber(0, array.length);
+  const randomIndex = getRandomIntegerNumber(0, array.length - 1);
 
   return array[randomIndex];
 };
@@ -41,6 +40,7 @@ const getRandomArray = (array, min, max) => {
   if (max === undefined) {
     max = min;
   }
+
   const randomNumber = getRandomIntegerNumber(min, max);
   const copyArray = array.slice();
   const randomArr = [];
@@ -50,6 +50,7 @@ const getRandomArray = (array, min, max) => {
     randomArr.push(copyArray[randomIndex]);
     copyArray.splice(randomIndex, 1);
   }
+
   return randomArr;
 };
 
@@ -57,17 +58,8 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max + 1 - min));
 };
 
-// const addPriceToOffers = () => {
-//   return (
-//     {
-//       "title": offerTitles[getRandomIntegerNumber(0, offerTitles.length)],
-//       "price": getRandomIntegerNumber(MIN_OFFER_COST, MAX_OFFER_COST),
-//     }
-//   );
-// };
-
-const getSetOfOffers = () => {
-  const setOfOffers = getRandomArray(offerTitles, 1, 5).map((title) => {
+const getSetOfOffers = () => { // функция возвращает набор доп. опций
+  const setOfOffers = getRandomArray(offerTitles, MAX_COUNT_OFFERS_FOR_TYPE).map((title) => {
     return (
       {
         "title": title,
@@ -81,12 +73,7 @@ const getSetOfOffers = () => {
 const generateTypesWithOffers = () => { // функция создает массив объектов, где каждому типу точки соответствует определенный набор дополнительных опций
   const typesWithOffers = [];
 
-  //const countOffers = getRandomIntegerNumber(MIN_COUNT_OFFERS_FOR_TYPE, MAX_COUNT_OFFERS_FOR_TYPE);
-
-
-
-  for (const item of eventTypes) {
-
+  for (const item of EVENT_TYPES) {
     typesWithOffers.push(
         {
           "type": item,
@@ -99,23 +86,7 @@ const generateTypesWithOffers = () => { // функция создает мас�
 
 const typesWithOffers = generateTypesWithOffers();
 
-console.log(typesWithOffers);
-
-// const generateRandomOffers = (titles, min, max) => {
-//   const randomTitles = getRandomArray(offerTitles, min, max);
-//   const randomOffers = [];
-//   for (const title of randomTitles) {
-//     randomOffers.push(
-//         {
-//           "title": title,
-//           "price": getRandomIntegerNumber(MIN_OFFER_COST, MAX_OFFER_COST),
-//         }
-//     );
-//   }
-//   return randomOffers;
-// };
-
-const generatePhotos = (count) => {
+const generatePhotos = (count) => { // функция генерирует набор случайных фотографий (картинок)
   return new Array(count)
   .fill(``)
   .map(() => {
@@ -123,26 +94,21 @@ const generatePhotos = (count) => {
   });
 };
 
-// const getTypeWithOffers = () => { // функция создает массив, где каждому типу точки соответствует определенный набор дополнительных опций
-//
-// };
-
 const generateEvent = () => {
   const dateFrom = new Date(Date.now() + getRandomIntegerNumber(0, ONE_DAY_TIME * MAX_TRIP_DAYS_FROM));
-  const type = getRandomArrayItem(eventTypes);
+  const type = getRandomArrayItem(EVENT_TYPES);
   const typeWithOffers = typesWithOffers.find((item) => {
     return item.type === type;
   });
-//  const offers = getRandomArray(typeWithOffers.offers, typeWithOffers.offers.length);
 
   return {
     type,
     destination: {
       name: getRandomArrayItem(cities),
-      description: getRandomArray(descrtiption, 1, 6).join(` `),
-      pictures: generatePhotos(getRandomIntegerNumber(1, 6)),
+      description: getRandomArray(descrtiptions, 1, 5).join(` `),
+      pictures: generatePhotos(getRandomIntegerNumber(1, 5)),
     },
-    offers: getRandomArray(typeWithOffers.offers, typeWithOffers.offers.length),
+    offers: getRandomArray(typeWithOffers.offers, 0, typeWithOffers.offers.length),
     dateFrom,
     dateTo: new Date(dateFrom.getTime() + getRandomIntegerNumber(0, ONE_DAY_TIME * MAX_EVENT_DAYS)),
     price: getRandomIntegerNumber(MIN_POINT_COST, MAX_POINT_COST),
@@ -156,4 +122,4 @@ const generateEvents = (count) => {
   .map(generateEvent);
 };
 
-export {generateEvents};
+export {cities, typesWithOffers, generateEvents};

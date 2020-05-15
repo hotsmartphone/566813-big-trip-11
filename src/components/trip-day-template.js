@@ -1,9 +1,9 @@
-import {SHORT_MONTH_NAMES} from "../const.js";
+import {getShortDate} from "../utils.js";
 import {createEventItemTemplate} from './event-item-template.js';
 
 
 const createTripDayTemplate = (day, index) => {
-  const shortDate = SHORT_MONTH_NAMES[day.date.getMonth()].toUpperCase() + ` ` + day.date.getDate();
+  const shortDate = getShortDate(day.date);
 
   const eventsList = day.events
     .map((event) => createEventItemTemplate(event))

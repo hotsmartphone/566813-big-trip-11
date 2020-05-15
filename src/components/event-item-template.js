@@ -1,9 +1,7 @@
-import {castTimeFormat} from "../utils.js";
-import {formatTime} from "../utils.js";
+import {ACTIVITY_EVENT_TYPES} from "../const.js";
+import {castTimeFormat, formatTime} from "../utils.js";
 
 const DISPLAYED_OFFERS_COUNT = 3;
-
-const eventTypesPrepositionIn = [`Check-in`, `Sightseeing`, `Restaurant`];
 
 const createOffersMurkup = (offers) => {
   offers = offers.slice(0, DISPLAYED_OFFERS_COUNT);
@@ -16,9 +14,11 @@ const createOffersMurkup = (offers) => {
      </li>`
     );
   };
+
   const offerList = offers
     .map((offer) => createOfferTemplate(offer))
     .join(`\n`);
+
   return (
     `<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
@@ -29,8 +29,13 @@ const createOffersMurkup = (offers) => {
 
 const createEventItemTemplate = (event) => {
   const {type, destination, offers, dateFrom, dateTo, price} = event;
-  const withPrepositionIn = eventTypesPrepositionIn.includes(type);
-  const eventDuration = () => {
+
+  const withPrepositionIn = ACTIVITY_EVENT_TYPES.includes(type);
+  const offersMarkup = offers.length > 0 ? createOffersMurkup(offers) : ``;
+  const timeFrom = formatTime(dateFrom);
+  const timeTo = formatTime(dateTo);
+
+  const geteEventDuration = () => { // функция вычилсяет продолжительность (дней, часов и минут) данного события
     const dateDiff = dateTo - dateFrom;
     const minutesFrom = dateFrom.getMinutes();
     const minutesTo = dateTo.getMinutes();
@@ -39,21 +44,19 @@ const createEventItemTemplate = (event) => {
       hours: castTimeFormat(Math.floor(dateDiff / (1000 * 3600)) % 24),
       minutes: castTimeFormat(minutesTo > minutesFrom ? minutesTo - minutesFrom : minutesTo - minutesFrom + 60), // для правильного подсчета, так как пользователь будет видеть только часы и минуты
     };
-    if (Number(duration.days) === 0) {
+
+    if (Number(duration.days) === 0) { // вычисляет строку, в заивисимости от продолжительности события
       if (Number(duration.hours) === 0) {
-        return (`${duration.minutes}M`);
+        return (`${duration.minutes}M`); // если событие длилось несколько минут (меньше часа)
       } else {
-        return (`${duration.hours}H ${duration.minutes}M`);
+        return (`${duration.hours}H ${duration.minutes}M`); // если событие длилось меньше дня, но больше часа
       }
     } else {
-      return (`${duration.days}D ${duration.hours}H ${duration.minutes}M`);
+      return (`${duration.days}D ${duration.hours}H ${duration.minutes}M`); // если событие длилось больше часа
     }
   };
-  const offersMarkup = offers.length > 0 ? createOffersMurkup(offers) : ``;
-  const durationTime = eventDuration();
 
-  const timeFrom = formatTime(dateFrom);
-  const timeTo = formatTime(dateTo);
+  const durationTime = geteEventDuration();
 
   return (
     `<li class="trip-events__item">
