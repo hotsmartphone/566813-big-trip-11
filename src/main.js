@@ -63,8 +63,6 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
 
 const groupedEvents = groupAndSortEventsByDays(events);
 
-console.log(events);
-
 render(menuControls, createViewMenuTemplate(), `afterend`);
 render(tripControls, createTripFiltersTemplate());
 render(tripEvents, createTripSortTemplate());
@@ -74,10 +72,6 @@ render(tripMain, createTripInfoTemplate(events, groupedEvents), `afterbegin`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
 
 render(tripInfo, createTripCostTemplate(events));
-
-console.log(`Сгруппированный и отсортированный массив]`);
-console.log(groupedEvents);
-
 
 groupedEvents.forEach((day, index) => {
   render(tripEvents, createTripDayTemplate(day, index));
