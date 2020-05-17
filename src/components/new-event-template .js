@@ -1,85 +1,115 @@
-const createNewEventTemplate = () => {
+import {TRANSFER_EVENT_TYPES, ACTIVITY_EVENT_TYPES} from "../const.js";
+import {cities, typesWithOffers} from "../mock/point.js";
+import {formatDateAndTime} from "../utils.js";
+
+const createTypesMarkup = (types, currentType) => {
+  return types
+  .map((type) => {
+    const lowerCaseType = type.toLowerCase();
+    return `<div class="event__type-item">
+          <input id="event-type-${lowerCaseType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${lowerCaseType}" ${currentType === type ? `checked` : ``}>
+          <label class="event__type-label  event__type-label--${lowerCaseType}" for="event-type-${lowerCaseType}-1">${type}</label>
+        </div>`;
+  })
+  .join(`\n`);
+};
+
+const createDestinationNamesMarkup = (names) => {
+  return names
+  .map((name) => {
+    return `<option value="${name}"></option>`;
+  })
+  .join(`\n`);
+};
+
+const createPhotosMarkup = (photos) => {
+  const photosList = photos
+  .map((photo) => {
+    return `<img class="event__photo" src="${photo}" alt="Event photo">`;
+  })
+  .join(`\n`);
+
+  return (
+    `<div class="event__photos-container">
+        <div class="event__photos-tape">
+        ${photosList}
+        </div>
+      </div>`
+  );
+};
+
+const createOffersMarkUp = (currentType, currentOffers) => { // функция принимает на вход тип конкретного события и его доп. опции
+  const currentTypeWithOffers = typesWithOffers.find((item) => { // вычисляет тип события с набором всех возможных доп.опций (не данного события). Нужно для последующего сравнения.
+    return item.type === currentType;
+  });
+
+  const createOfferMarkup = (offer) => {
+    const kindOfTitle = offer.title.split(` `).pop(); // вычисляет тип доп.опции по окончанию ее названия
+
+    const isChecked = currentOffers // проверяет, если данная обция среди опций, указанных в конкретном событии
+    .map(JSON.stringify)
+    .includes(JSON.stringify(offer));
+
+    return (`<div class="event__offer-selector">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${kindOfTitle}-1" type="checkbox" name="event-offer-${kindOfTitle}" ${isChecked ? `checked` : ``}>
+    <label class="event__offer-label" for="event-offer-${kindOfTitle}-1">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+    </label>
+  </div>`
+    );
+  };
+
+  return currentTypeWithOffers.offers // возвращает разметку ВСЕХ возможных опций для данного типа. Отмечает найденные в событии опции.
+  .map(createOfferMarkup)
+  .join(`\n`);
+};
+
+const createNewEventTemplate = (event) => {
+  const {type, destination, offers, dateFrom, dateTo, price} = event;
+
+  const transferEventsMarkup = createTypesMarkup(TRANSFER_EVENT_TYPES, type);
+  const activityEventsMarkup = createTypesMarkup(ACTIVITY_EVENT_TYPES, type);
+  const photosMarkup = destination.pictures ? createPhotosMarkup(destination.pictures) : ``;
+  const offersMarkUp = offers ? createOffersMarkUp(type, offers) : ``;
+  const destinationNamesMarkup = createDestinationNamesMarkup(cities);
+
+  const formatedDateFrom = dateFrom instanceof Date ? formatDateAndTime(dateFrom) : formatDateAndTime(new Date());
+  const formatedDateTo = dateTo instanceof Date ? formatDateAndTime(dateTo) : formatDateAndTime(new Date());
+
+  const withPrepositionIn = ACTIVITY_EVENT_TYPES.includes(type);
+
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type ? type : `Bus`}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Transfer</legend>
-
-              <div class="event__type-item">
-                <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-                <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-              </div>
+              ${transferEventsMarkup}
             </fieldset>
 
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Activity</legend>
-
-              <div class="event__type-item">
-                <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-              </div>
+              ${activityEventsMarkup}
             </fieldset>
           </div>
         </div>
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            Flight to
+            ${type ? type : `Bus`} ${withPrepositionIn ? `in` : `to`}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
-            <option value="Saint Petersburg"></option>
+            ${destinationNamesMarkup}
           </datalist>
         </div>
 
@@ -87,12 +117,12 @@ const createNewEventTemplate = () => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatedDateFrom}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 00:00">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatedDateTo}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -100,79 +130,36 @@ const createNewEventTemplate = () => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
-      <section class="event__details">
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      ${offers || (destination.description || destination.pictures) ? // Если есть доп. опции или описание места или картинки места - покажет раздел с деталями.
+      `<section class="event__details">
+        ${offers ? // Если есть раздел с доп. опциями - покажет его, если нет - ничего.
+      `<section class="event__section  event__section--offers">
+              <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-          <div class="event__available-offers">
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-              <label class="event__offer-label" for="event-offer-luggage-1">
-                <span class="event__offer-title">Add luggage</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">30</span>
-              </label>
-            </div>
+              <div class="event__available-offers">
+              ${offersMarkUp}
+              </div>
+            </section>`
+      : ``
+    }
 
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-              <label class="event__offer-label" for="event-offer-comfort-1">
-                <span class="event__offer-title">Switch to comfort class</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">100</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-              <label class="event__offer-label" for="event-offer-meal-1">
-                <span class="event__offer-title">Add meal</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">15</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-              <label class="event__offer-label" for="event-offer-seats-1">
-                <span class="event__offer-title">Choose seats</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">5</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-              <label class="event__offer-label" for="event-offer-train-1">
-                <span class="event__offer-title">Travel by train</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">40</span>
-              </label>
-            </div>
-          </div>
-        </section>
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
-
-          <div class="event__photos-container">
-            <div class="event__photos-tape">
-              <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-            </div>
-          </div>
-        </section>
-      </section>
+            ${destination.description || destination.pictures ? // Если есть раздел с описанием - покажет его, если нет - ничего.
+      `<section class="event__section  event__section--destination">
+            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${destination.description}</p>
+            ${photosMarkup}
+          </section>`
+      : ``
+    }
+      </section>`
+      : ``
+    }
     </form>`
   );
 };
