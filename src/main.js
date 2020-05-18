@@ -1,5 +1,6 @@
 import TripInfoComponent from './components/trip-info-template.js';
-import TripCostComponent from './components/trip-cost-template.js';
+import TripInfoMainComponent from './components/trip-info-main-template.js';
+import TripInfoCostComponent from './components/trip-info-cost-template.js';
 import ViewMenuComponent from './components/view-menu-template.js';
 import TripFiltersComponent from './components/trip-filters-template.js';
 import TripSortComponent from './components/trip-sort-template.js';
@@ -7,6 +8,7 @@ import NewEventComponent from './components/new-event-template.js';
 import TripDayComponent from './components/trip-day-template.js';
 import TripDaysBoardComponent from './components/trip-days-board-template.js';
 import EventItemComponent from './components/event-item-template.js';
+import NoEventsComponent from './components/no-events-template.js';
 
 import {generateEvents} from './mock/point.js';
 import {RenderPosition, render} from './utils.js';
@@ -65,15 +67,11 @@ const groupedEvents = groupAndSortEventsByDays(events);
 
 render(menuControls, new ViewMenuComponent().getElement(), RenderPosition.AFTEREND);
 render(tripControls, new TripFiltersComponent().getElement(), RenderPosition.BEFOREEND);
-render(tripEvents, new TripSortComponent().getElement(), RenderPosition.BEFOREEND);
-render(tripMain, new TripInfoComponent(events, groupedEvents).getElement(), RenderPosition.AFTERBEGIN);
 
-const tripInfo = tripMain.querySelector(`.trip-info`);
+const tripInfoComponent = new TripInfoComponent().getElement();
 
-render(tripInfo, new TripCostComponent(events).getElement(), RenderPosition.BEFOREEND);
-render(tripEvents, new TripDaysBoardComponent().getElement(), RenderPosition.BEFOREEND);
-
-const daysBoard = tripEvents.querySelector(`.trip-days`);
+render(tripMain, tripInfoComponent, RenderPosition.AFTERBEGIN);
+render(tripInfoComponent, new TripInfoCostComponent(events).getElement(), RenderPosition.BEFOREEND);
 
 const renderTask = (dayEventsElement, event) => {
   const replaceEventToEdit = () => {
@@ -116,14 +114,24 @@ const renderTask = (dayEventsElement, event) => {
   render(dayEventsElement, eventItemComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
-const renderDay = (day, index) => { // функция принимает на вход обект с датой и событиями этой даты, отрисовывает день и в нем отрисовывает события
-  render(daysBoard, new TripDayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
-  const currentDayEventsList = daysBoard.lastChild.querySelector(`.trip-events__list`);
+const renderDay = (container, day, index) => { // функция принимает на вход обект с датой и событиями этой даты, отрисовывает день и в нем отрисовывает события
+  render(container, new TripDayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
+  const currentDayEventsList = container.lastChild.querySelector(`.trip-events__list`);
   day.events.forEach((event) => {
     renderTask(currentDayEventsList, event);
   });
 };
 
-groupedEvents.forEach((day, index) => {
-  renderDay(day, index);
-});
+if (events.length === 0 || !events) {
+  render(tripEvents, new NoEventsComponent().getElement(), RenderPosition.BEFOREEND);
+} else {
+  render(tripEvents, new TripSortComponent().getElement(), RenderPosition.BEFOREEND);
+  render(tripMain, new TripInfoMainComponent(events, groupedEvents).getElement(), RenderPosition.AFTERBEGIN);
+
+  const tripDaysBoardComponent = new TripDaysBoardComponent().getElement();
+  render(tripEvents, tripDaysBoardComponent, RenderPosition.BEFOREEND);
+
+  groupedEvents.forEach((day, index) => {
+    renderDay(tripDaysBoardComponent, day, index);
+  });
+}
