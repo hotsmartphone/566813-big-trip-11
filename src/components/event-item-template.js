@@ -113,4 +113,3 @@ class EventItem {
 }
 
 export default EventItem;
-export {createEventItemTemplate};

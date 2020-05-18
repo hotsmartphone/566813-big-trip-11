@@ -6,7 +6,7 @@ const createTripDaysTemplate = () => {
   );
 };
 
-class TripDays {
+class TripDaysBoard {
   constructor() {
     this._element = null;
   }
@@ -28,4 +28,4 @@ class TripDays {
   }
 }
 
-export default TripDays;
+export default TripDaysBoard;
