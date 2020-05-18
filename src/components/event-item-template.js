@@ -1,5 +1,5 @@
 import {ACTIVITY_EVENT_TYPES} from "../const.js";
-import {castTimeFormat, formatTime} from "../utils.js";
+import {castTimeFormat, formatTime, createElement} from "../utils.js";
 
 const DISPLAYED_OFFERS_COUNT = 3;
 
@@ -52,7 +52,7 @@ const createEventItemTemplate = (event) => {
         return (`${duration.hours}H ${duration.minutes}M`); // если событие длилось меньше дня, но больше часа
       }
     } else {
-      return (`${duration.days}D ${duration.hours}H ${duration.minutes}M`); // если событие длилось больше часа
+      return (`${duration.days}D ${duration.hours}H ${duration.minutes}M`); // если событие длилось больше дня
     }
   };
 
@@ -89,4 +89,27 @@ const createEventItemTemplate = (event) => {
   );
 };
 
-export {createEventItemTemplate};
+class EventItem {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventItemTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EventItem;

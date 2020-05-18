@@ -1,11 +1,13 @@
-import {createTripInfoTemplate} from './components/trip-info-template.js';
-import {createTripCostTemplate} from './components/trip-cost-template.js';
-import {createViewMenuTemplate} from './components/view-menu-template .js';
-import {createTripFiltersTemplate} from './components/trip-filters-template.js';
-import {createTripSortTemplate} from './components/trip-sort-template .js';
-import {createNewEventTemplate} from './components/new-event-template .js';
-import {createTripDayTemplate} from './components/trip-day-template.js';
+import {TripInfoComponent} from './components/trip-info-template.js';
+import {TripCostComponent} from './components/trip-cost-template.js';
+import {ViewMenuComponent} from './components/view-menu-template.js';
+import {TripFiltersComponent} from './components/trip-filters-template.js';
+import {TripSortComponent} from './components/trip-sort-template.js';
+import {NewEventComponent} from './components/new-event-template.js';
+import {TripDayComponent} from './components/trip-day-template.js';
 import {generateEvents} from './mock/point.js';
+
+//import {RenderPosition, render} from '../utils.js';
 
 const POINT_TRIP_COUNT = 20;
 
@@ -14,9 +16,11 @@ const tripControls = tripMain.querySelector(`.trip-controls`);
 const menuControls = tripControls.querySelector(`h2`);
 const tripEvents = document.querySelector(`.trip-events`);
 
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
+const reder
+
+// const render = (container, template, place = `beforeend`) => {
+//   container.insertAdjacentHTML(place, template);
+// };
 
 const events = generateEvents(POINT_TRIP_COUNT);
 
@@ -48,7 +52,7 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
 
   eventsArr.forEach((event) => groupEvents(event, groupedEvents));
 
-  groupedEvents.sort((a, b) => { // сортируем блоки событий по дате
+  groupedEvents.sort((a, b) => { // сортируем в блоки событий по дате
     return a.date.getTime() - b.date.getTime();
   });
 

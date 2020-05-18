@@ -1,4 +1,5 @@
 import {EVENT_TYPES} from "../const.js";
+
 const MIN_OFFER_COST = 1;
 const MAX_OFFER_COST = 300;
 const MAX_COUNT_OFFERS_FOR_TYPE = 5;
