@@ -1,18 +1,18 @@
 import {createElement} from "../utils.js";
 
-const createTripInfoTemplate = () => {
+const createNoEventsTemplate = () => {
   return (
-    `<section class="trip-main__trip-info  trip-info"></section>`
+    `<p class="trip-events__msg">Click New Event to create your first point</p>`
   );
 };
 
-class TripInfo {
+class NoEvents {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createTripInfoTemplate(this._events);
+    return createNoEventsTemplate();
   }
 
   getElement() {
@@ -28,4 +28,4 @@ class TripInfo {
   }
 }
 
-export default TripInfo;
+export default NoEvents;

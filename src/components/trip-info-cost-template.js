@@ -10,7 +10,7 @@ const createTripCostTemplate = (events) => {
   );
 };
 
-class TripCost {
+class TripInfoCost {
   constructor(events) {
     this._events = events;
     this._element = null;
@@ -33,4 +33,4 @@ class TripCost {
   }
 }
 
-export default TripCost;
+export default TripInfoCost;
