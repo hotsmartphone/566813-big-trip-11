@@ -1,13 +1,13 @@
-import {TripInfoComponent} from './components/trip-info-template.js';
-import {TripCostComponent} from './components/trip-cost-template.js';
-import {ViewMenuComponent} from './components/view-menu-template.js';
-import {TripFiltersComponent} from './components/trip-filters-template.js';
-import {TripSortComponent} from './components/trip-sort-template.js';
-import {NewEventComponent} from './components/new-event-template.js';
-import {TripDayComponent} from './components/trip-day-template.js';
+import TripInfoComponent from './components/trip-info-template.js';
+import TripCostComponent from './components/trip-cost-template.js';
+import ViewMenuComponent from './components/view-menu-template.js';
+import TripFiltersComponent from './components/trip-filters-template.js';
+import TripSortComponent from './components/trip-sort-template.js';
+import NewEventComponent from './components/new-event-template.js';
+import TripDayComponent from './components/trip-day-template.js';
 import {generateEvents} from './mock/point.js';
 
-//import {RenderPosition, render} from '../utils.js';
+import {RenderPosition, render} from './utils.js';
 
 const POINT_TRIP_COUNT = 20;
 
@@ -16,7 +16,7 @@ const tripControls = tripMain.querySelector(`.trip-controls`);
 const menuControls = tripControls.querySelector(`h2`);
 const tripEvents = document.querySelector(`.trip-events`);
 
-const reder
+
 
 // const render = (container, template, place = `beforeend`) => {
 //   container.insertAdjacentHTML(place, template);
@@ -67,16 +67,19 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
 
 const groupedEvents = groupAndSortEventsByDays(events);
 
-render(menuControls, createViewMenuTemplate(), `afterend`);
-render(tripControls, createTripFiltersTemplate());
-render(tripEvents, createTripSortTemplate());
-render(tripEvents, createNewEventTemplate(events[0]));
-render(tripMain, createTripInfoTemplate(events, groupedEvents), `afterbegin`);
+render(menuControls, new ViewMenuComponent().getElement(), RenderPosition.AFTEREND);
+render(tripControls, new TripFiltersComponent().getElement(), RenderPosition.BEFOREEND);
+//////////////////////////////render(tripControls, createTripFiltersTemplate());
+render(tripEvents, new TripSortComponent().getElement(), RenderPosition.BEFOREEND);
+
+//render(tripEvents, new TripSortComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new NewEventComponent(events[0]).getElement(), RenderPosition.BEFOREEND);
+render(tripMain, new TripInfoComponent(events, groupedEvents).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfo = tripMain.querySelector(`.trip-info`);
 
-render(tripInfo, createTripCostTemplate(events));
+render(tripInfo, new TripCostComponent(events).getElement(), RenderPosition.BEFOREEND);
 
 groupedEvents.forEach((day, index) => {
-  render(tripEvents, createTripDayTemplate(day, index));
+  render(tripEvents, new TripDayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
 });
