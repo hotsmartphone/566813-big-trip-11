@@ -1,11 +1,15 @@
-import {createTripInfoTemplate} from './components/trip-info-template.js';
-import {createTripCostTemplate} from './components/trip-cost-template.js';
-import {createViewMenuTemplate} from './components/view-menu-template .js';
-import {createTripFiltersTemplate} from './components/trip-filters-template.js';
-import {createTripSortTemplate} from './components/trip-sort-template .js';
-import {createNewEventTemplate} from './components/new-event-template .js';
-import {createTripDayTemplate} from './components/trip-day-template.js';
+import TripInfoComponent from './components/trip-info-template.js';
+import TripCostComponent from './components/trip-cost-template.js';
+import ViewMenuComponent from './components/view-menu-template.js';
+import TripFiltersComponent from './components/trip-filters-template.js';
+import TripSortComponent from './components/trip-sort-template.js';
+import NewEventComponent from './components/new-event-template.js';
+import TripDayComponent from './components/trip-day-template.js';
+import TripDaysBoardComponent from './components/trip-days-board-template.js';
+import EventItemComponent from './components/event-item-template.js';
+
 import {generateEvents} from './mock/point.js';
+import {RenderPosition, render} from './utils.js';
 
 const POINT_TRIP_COUNT = 20;
 
@@ -13,10 +17,6 @@ const tripMain = document.querySelector(`.trip-main`);
 const tripControls = tripMain.querySelector(`.trip-controls`);
 const menuControls = tripControls.querySelector(`h2`);
 const tripEvents = document.querySelector(`.trip-events`);
-
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const events = generateEvents(POINT_TRIP_COUNT);
 
@@ -48,7 +48,7 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
 
   eventsArr.forEach((event) => groupEvents(event, groupedEvents));
 
-  groupedEvents.sort((a, b) => { // сортируем блоки событий по дате
+  groupedEvents.sort((a, b) => { // сортируем в блоки событий по дате
     return a.date.getTime() - b.date.getTime();
   });
 
@@ -63,16 +63,67 @@ const groupAndSortEventsByDays = (eventsArr) => { // функция  прини�
 
 const groupedEvents = groupAndSortEventsByDays(events);
 
-render(menuControls, createViewMenuTemplate(), `afterend`);
-render(tripControls, createTripFiltersTemplate());
-render(tripEvents, createTripSortTemplate());
-render(tripEvents, createNewEventTemplate(events[0]));
-render(tripMain, createTripInfoTemplate(events, groupedEvents), `afterbegin`);
+render(menuControls, new ViewMenuComponent().getElement(), RenderPosition.AFTEREND);
+render(tripControls, new TripFiltersComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new TripSortComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripMain, new TripInfoComponent(events, groupedEvents).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfo = tripMain.querySelector(`.trip-info`);
 
-render(tripInfo, createTripCostTemplate(events));
+render(tripInfo, new TripCostComponent(events).getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new TripDaysBoardComponent().getElement(), RenderPosition.BEFOREEND);
+
+const daysBoard = tripEvents.querySelector(`.trip-days`);
+
+const renderTask = (dayEventsElement, event) => {
+  const replaceEventToEdit = () => {
+    dayEventsElement.replaceChild(editEventComponent.getElement(), eventItemComponent.getElement());
+  };
+
+  const replaceEditToEvent = () => {
+    dayEventsElement.replaceChild(eventItemComponent.getElement(), editEventComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      replaceEditToEvent();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  const eventItemComponent = new EventItemComponent(event);
+  const editButton = eventItemComponent.getElement().querySelector(`.event__rollup-btn`);
+  editButton.addEventListener(`click`, () => {
+    replaceEventToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  const editEventComponent = new NewEventComponent(event);
+  editEventComponent.getElement().addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceEditToEvent();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  editEventComponent.getElement().addEventListener(`reset`, (evt) => {
+    evt.preventDefault();
+    replaceEditToEvent();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(dayEventsElement, eventItemComponent.getElement(), RenderPosition.BEFOREEND);
+};
+
+const renderDay = (day, index) => { // функция принимает на вход обект с датой и событиями этой даты, отрисовывает день и в нем отрисовывает события
+  render(daysBoard, new TripDayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
+  const currentDayEventsList = daysBoard.lastChild.querySelector(`.trip-events__list`);
+  day.events.forEach((event) => {
+    renderTask(currentDayEventsList, event);
+  });
+};
 
 groupedEvents.forEach((day, index) => {
-  render(tripEvents, createTripDayTemplate(day, index));
+  renderDay(day, index);
 });

@@ -1,6 +1,6 @@
 import {TRANSFER_EVENT_TYPES, ACTIVITY_EVENT_TYPES} from "../const.js";
 import {cities, typesWithOffers} from "../mock/point.js";
-import {formatDateAndTime} from "../utils.js";
+import {formatDateAndTime, createElement} from "../utils.js";
 
 const createTypesMarkup = (types, currentType) => {
   return types
@@ -164,4 +164,27 @@ const createNewEventTemplate = (event) => {
   );
 };
 
-export {createNewEventTemplate};
+class NewEvent {
+  constructor(event) {
+    this._event = event;
+    this.element = null;
+  }
+
+  getTemplate() {
+    return createNewEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default NewEvent;

@@ -1,4 +1,4 @@
-import {castTimeFormat, getShortDate} from "../utils.js";
+import {castTimeFormat, getShortDate, createElement} from "../utils.js";
 
 const getTripDateRange = (from, to) => { // функция анализирует даты и выводит строку в соответствующем формате
   if ((from - to) === 0) {
@@ -26,7 +26,7 @@ const createTripInfoTemplate = (events, sortedEvents) => {
 
   let middleDestination = ``;
 
-  if (intermediateDestinations.size === 1) { // добавит промежуточный город в заголов, если он один
+  if (intermediateDestinations.size === 1) { // добавит промежуточный город в заголовок, если он один
     middleDestination = Array.from(intermediateDestinations)[0];
   } else if (intermediateDestinations.size > 1) { // добавит три точки, если промежуточных городов несколько
     middleDestination = `...`;
@@ -43,4 +43,28 @@ const createTripInfoTemplate = (events, sortedEvents) => {
   );
 };
 
-export {createTripInfoTemplate};
+class TripInfo {
+  constructor(events, sortedEvents) {
+    this._events = events;
+    this._sortedEvents = sortedEvents;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._events, this._sortedEvents);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripInfo;
