@@ -1,6 +1,7 @@
 import {TRANSFER_EVENT_TYPES, ACTIVITY_EVENT_TYPES} from "../const.js";
+import AbstractComponent from "./abstract-component.js";
 import {cities, typesWithOffers} from "../mock/point.js";
-import {formatDateAndTime, createElement} from "../utils.js";
+import {formatDateAndTime} from "../utils/common.js";
 
 const createTypesMarkup = (types, currentType) => {
   return types
@@ -164,26 +165,25 @@ const createNewEventTemplate = (event) => {
   );
 };
 
-class NewEvent {
+class NewEvent extends AbstractComponent {
   constructor(event) {
+    super();
+
     this._event = event;
-    this.element = null;
   }
 
   getTemplate() {
     return createNewEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setSubmitHandler(handler) {
+    this.getElement()
+      .addEventListener(`submit`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  setResetHandler(handler) {
+    this.getElement()
+      .addEventListener(`reset`, handler);
   }
 }
 

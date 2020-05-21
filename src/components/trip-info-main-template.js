@@ -1,4 +1,5 @@
-import {castTimeFormat, getShortDate, createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import {castTimeFormat, getShortDate} from "../utils/common.js";
 
 const getTripDateRange = (from, to) => { // функция анализирует даты и выводит строку в соответствующем формате
   if ((from - to) === 0) {
@@ -10,15 +11,25 @@ const getTripDateRange = (from, to) => { // функция анализируе�
   }
 };
 
-const createTripInfoTemplate = (events, sortedEvents) => {
-  const destinationFrom = sortedEvents[0].events[0].destination.name; // берет город из первого события
-  const destinationTo = sortedEvents[sortedEvents.length - 1].events[sortedEvents[sortedEvents.length - 1].events.length - 1].destination.name; // берет город из последнего события
+const createTripInfoTemplate = (events) => {
+  if (!events || (events.length === 0)) {
+    return ` `;
+  }
 
-  const date = events ? getTripDateRange(sortedEvents[0].date, sortedEvents[sortedEvents.length - 1].date) : ``;
+  const sortedByDateEvents = events
+    .slice()
+    .sort((a, b) => a.dateFrom.getTime() - b.dateFrom.getTime());
+
+  const eventFrom = sortedByDateEvents[0];
+  const eventTo = sortedByDateEvents[sortedByDateEvents.length - 1];
+
+  const date = events ? getTripDateRange(eventFrom.dateFrom, eventTo.dateTo) : ``;
+  const destinationFrom = eventFrom.destination.name; // берет город из первого события
+  const destinationTo = eventTo.destination.name; // берет город из последнего события
 
   const intermediateDestinations = new Set();
 
-  events.forEach((item) => { // вычисляет, есть ли в путешествии другие города, кроме начального и конечного. Сохраняет их в множество
+  sortedByDateEvents.forEach((item) => { // вычисляет, есть ли в путешествии другие города, кроме начального и конечного. Сохраняет их в множество
     if ((item.destination.name !== destinationFrom) && (item.destination.name !== destinationTo)) {
       intermediateDestinations.add(item.destination.name);
     }
@@ -41,27 +52,16 @@ const createTripInfoTemplate = (events, sortedEvents) => {
   );
 };
 
-class TripInfoMain {
+class TripInfoMain extends AbstractComponent {
   constructor(events, sortedEvents) {
+    super();
+
     this._events = events;
     this._sortedEvents = sortedEvents;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._events, this._sortedEvents);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
