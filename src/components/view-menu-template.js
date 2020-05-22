@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createViewMenuTemplate = () => {
   return (
@@ -9,25 +9,9 @@ const createViewMenuTemplate = () => {
   );
 };
 
-class ViewMenu {
-  constructor() {
-    this._element = null;
-  }
-
+class ViewMenu extends AbstractComponent {
   getTemplate() {
     return createViewMenuTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

@@ -1,5 +1,6 @@
 import {ACTIVITY_EVENT_TYPES} from "../const.js";
-import {castTimeFormat, formatTime, createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import {castTimeFormat, formatTime} from "../utils/common.js";
 
 const DISPLAYED_OFFERS_COUNT = 3;
 
@@ -89,26 +90,20 @@ const createEventItemTemplate = (event) => {
   );
 };
 
-class EventItem {
+class EventItem extends AbstractComponent {
   constructor(event) {
+    super();
+
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventItemTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }
 
